@@ -52,7 +52,7 @@ jobs:
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
         
-          make rockchip_linux_defconfig gpu.config kconfig.config kconfig1.config
+          make rockchip_linux_defconfig gpu.config
           make dtbs Image -j 16
           make modules -j 16
           sudo make modules_install INSTALL_MOD_PATH=out
