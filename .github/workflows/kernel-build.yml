@@ -1,0 +1,83 @@
+name: Build and Release Kernel-6.1
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    permissions: write-all
+    name: EAICM6 EdgeAIA runner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
+          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/known_hosts 
+      
+      - name: Print WORK_PATH
+        run: |
+          echo "Present Working Directory"
+          pwd
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install -y gcc-9 openssl devscripts build-essential crossbuild-essential-arm64 bc bison
+          sudo apt install -y gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu libelf-dev libssl-dev kmod cpio libssl-dev
+
+      - name: Clone and Compile
+        run: |
+          echo "Git-Lab repo cloning here....."
+        
+          git clone git@gitlab.com:edgeble/core/kernel-6.1.git
+          cd kernel-6.1
+        
+          mkdir out
+        
+          export ARCH=arm64
+          export CROSS_COMPILE=aarch64-linux-gnu-
+        
+          make rockchip_linux_defconfig gpu.config kconfig.config kconfig1.config
+          make dtbs Image -j 16
+          make modules -j 16
+          sudo make modules_install INSTALL_MOD_PATH=out
+
+      - name: Copy deb files and create archive
+        run: |
+          echo "Present Working Directory"
+          cd kernel-6.1
+          mkdir linux && mkdir -p dtb/rockchip && mkdir -p modules
+          cp -fv arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtb dtb/rockchip
+          cp -fv arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dtb dtb/rockchip
+          cp -frv arch/arm64/boot/Image dtb linux
+          tar -Jcf linux.tar.xz linux
+          cp -frv out/lib/modules/* modules
+          tar -Jcf modules.tar.xz modules
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v1.0"
+          body: |
+            - Intial Build
+            - Kernel-6.1  
+          files: |
+            kernel-6.1/linux.tar.xz
+            kernel-6.1/modules.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
