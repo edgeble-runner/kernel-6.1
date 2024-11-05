@@ -1,4 +1,4 @@
-name: Build and Release Kernel-6.1
+name: Build and Release Kernel-6.1 v1.1
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     permissions: write-all
-    name: EAICM6 EdgeAIA runner
+    name: Kernel EdgeAIA runner
     runs-on: ubuntu-latest
 
     steps:
@@ -73,10 +73,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.0"
+          tag_name: "v1.1"
           body: |
-            - Intial Build
-            - Kernel-6.1  
+            - kernel-6.1 v1.1 Build
+            - file .config added to linux directory  
           files: |
             kernel-6.1/linux.tar.xz
             kernel-6.1/modules.tar.xz
