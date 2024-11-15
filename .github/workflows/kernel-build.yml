@@ -73,10 +73,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.1"
+          tag_name: "v1.2"
           body: |
-            - kernel-6.1 v1.1 Build
-            - file .config added to linux directory  
+            - Build v1.2
+            - Kernel-6.1  
           files: |
             kernel-6.1/linux.tar.xz
             kernel-6.1/modules.tar.xz
