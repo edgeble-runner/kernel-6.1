@@ -61,24 +61,23 @@ jobs:
         run: |
           echo "Present Working Directory"
           cd kernel-6.1
-          mkdir linux && mkdir -p dtb/rockchip && mkdir -p modules
+          mkdir linux-6.1 && mkdir -p dtb/rockchip && mkdir -p modules-6.1
           cp -fv arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtb dtb/rockchip
           cp -fv arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dtb dtb/rockchip
-          cp -fv .config linux
-          cp -frv arch/arm64/boot/Image dtb linux
-          tar -Jcf linux.tar.xz linux
-          cp -frv out/lib/modules/* modules
-          tar -Jcf modules.tar.xz modules
+          cp -fv .config linux-6.1
+          cp -frv arch/arm64/boot/Image dtb linux-6.1
+          tar -Jcf linux-6.1.tar.xz linux-6.1
+          cp -frv out/lib/modules/* modules-6.1
+          tar -Jcf modules-6.1.tar.xz modules-6.1
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.2"
+          tag_name: "v1.3"
           body: |
-            - Build v1.2
-            - Kernel-6.1  
+            - Overlay
           files: |
-            kernel-6.1/linux.tar.xz
-            kernel-6.1/modules.tar.xz
+            kernel-6.1/linux-6.1.tar.xz
+            kernel-6.1/modules-6.1.tar.xz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
