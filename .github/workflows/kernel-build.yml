@@ -74,9 +74,11 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.4"
+          tag_name: "v1.5"
           body: |
-            - Overlay
+            - Fix DTB
+            - Add NCM6A-IO
+            - Add NCM6C-IO
           files: |
             kernel-6.1/linux-6.1.tar.xz
             kernel-6.1/modules-6.1.tar.xz
