@@ -74,11 +74,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.5"
+          tag_name: "v1.6"
           body: |
-            - Fix DTB
-            - Add NCM6A-IO
-            - Add NCM6C-IO
+            - Add DSI, eDP panel
+            - More DTBO
           files: |
             kernel-6.1/linux-6.1.tar.xz
             kernel-6.1/modules-6.1.tar.xz
