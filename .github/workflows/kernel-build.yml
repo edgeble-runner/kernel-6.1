@@ -74,10 +74,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.6"
+          tag_name: "v1.7"
           body: |
-            - Add DSI, eDP panel
-            - More DTBO
+            - Add 8852BE WiFi6
           files: |
             kernel-6.1/linux-6.1.tar.xz
             kernel-6.1/modules-6.1.tar.xz
