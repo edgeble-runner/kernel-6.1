@@ -9,58 +9,24 @@ jobs:
   build:
     permissions: write-all
     name: Edgeble Kernel-6.1 runner
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
 
-      - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
-          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/known_hosts 
-      
-      - name: Print WORK_PATH
-        run: |
-          echo "Present Working Directory"
-          pwd
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt install -y gcc-9 openssl devscripts build-essential crossbuild-essential-arm64 bc bison
-          sudo apt install -y gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu libelf-dev libssl-dev kmod cpio libssl-dev
-
       - name: Clone and Compile
         run: |
-          echo "Git-Lab repo cloning here....."
-        
-          git clone git@gitlab.com:edgeble/core/kernel-6.1.git
-          cd kernel-6.1
-        
-          mkdir out
-        
-          export ARCH=arm64
-          export CROSS_COMPILE=aarch64-linux-gnu-
-        
-          make rockchip_linux_defconfig gpu.config
-          make dtbs Image -j 16
-          make modules -j 16
-          sudo make modules_install INSTALL_MOD_PATH=out
+          cd /6tops/gitlab/edgeble/core/kernel-6.1
+          rm -rf /6tops/out
+          export CROSS_COMPILE=/6tops/edgeaia-buildroot/prebuilts/gcc/linux-x86/aarch64/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+          ARCH=arm64 make rockchip_linux_defconfig gpu.config edgeble-6tops.config
+          ARCH=arm64 make dtbs Image -j 16; ARCH=arm64 make modules -j 16; ARCH=arm64 make modules_install INSTALL_MOD_PATH=/6tops/out
 
       - name: Copy deb files and create archive
         run: |
           echo "Present Working Directory"
-          cd kernel-6.1
+          cd /6tops/gitlab/edgeble/core/kernel-6.1
           mkdir linux-6.1 && mkdir -p dtb/rockchip && mkdir -p modules-6.1
           cp -fv arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtb dtb/rockchip
           cp -fv arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtbo dtb/rockchip
@@ -68,7 +34,7 @@ jobs:
           cp -fv .config linux-6.1
           cp -frv arch/arm64/boot/Image dtb linux-6.1
           tar -Jcf linux-6.1.tar.xz linux-6.1
-          cp -frv out/lib/modules/* modules-6.1
+          cp -frv /6tops/out/lib/modules/* modules-6.1
           tar -Jcf modules-6.1.tar.xz modules-6.1
 
       - name: Create Release
@@ -78,7 +44,7 @@ jobs:
           body: |
             - Add 8852BE WiFi6
           files: |
-            kernel-6.1/linux-6.1.tar.xz
-            kernel-6.1/modules-6.1.tar.xz
+            /6tops/gitlab/edgeble/core/kernel-6.1/linux-6.1.tar.xz
+            /6tops/gitlab/edgeble/core/kernel-6.1/modules-6.1.tar.xz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
