@@ -18,9 +18,9 @@ jobs:
       - name: Clone and Compile
         run: |
           cd /6tops/gitlab/edgeble/core/kernel-6.1
-          rm -rf /6tops/out
+          rm -rf /6tops/out && rm -rf linux-6.1* && rm -rf modules-6.1*
           export CROSS_COMPILE=/6tops/edgeaia-buildroot/prebuilts/gcc/linux-x86/aarch64/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
-          ARCH=arm64 make rockchip_linux_defconfig gpu.config edgeble-6tops.config
+          ARCH=arm64 make rockchip_linux_defconfig gpu.config
           ARCH=arm64 make dtbs Image -j 16; ARCH=arm64 make modules -j 16; ARCH=arm64 make modules_install INSTALL_MOD_PATH=/6tops/out
 
       - name: Copy deb files and create archive
@@ -40,7 +40,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.8"
+          tag_name: "v1.9"
           body: |
             - Enable CAN
           files: |
