@@ -40,9 +40,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.11"
+          tag_name: "v1.12"
           body: |
-            - Fix 8HD DSI
+            - Fix 4K Cam
           files: |
             /6tops/gitlab/edgeble/core/kernel-6.1/linux-6.1.tar.xz
             /6tops/gitlab/edgeble/core/kernel-6.1/modules-6.1.tar.xz
