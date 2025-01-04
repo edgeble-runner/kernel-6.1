@@ -17,34 +17,43 @@ jobs:
 
       - name: Clone and Compile
         run: |
-          cd /6tops/gitlab/edgeble/core/kernel-6.1
-          rm -rf /6tops/out && rm -rf linux-6.1* && rm -rf modules-6.1*
-          export CROSS_COMPILE=/6tops/edgeaia-buildroot/prebuilts/gcc/linux-x86/aarch64/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
-          ARCH=arm64 make rockchip_linux_defconfig gpu.config
-          ARCH=arm64 make dtbs Image -j 16; ARCH=arm64 make modules -j 16; ARCH=arm64 make modules_install INSTALL_MOD_PATH=/6tops/out
+          git clone git@gitlab.com:edgeble/core/kernel-6.1.git && cd kernel-6.1
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          ARCH=arm64 make rockchip_linux_defconfig gpu.config edgeble-6tops.config
+          mkdir -p ${{ github.workspace }}/out
+          mkdir -p ${{ github.workspace }}/out/linux-6.1
+          mkdir -p ${{ github.workspace }}/out/dtb/rockchip
+          mkdir -p ${{ github.workspace }}/out/modules-6.1
+          ARCH=arm64 make dtbs Image -j 16; ARCH=arm64 make modules -j 16; ARCH=arm64 make modules_install INSTALL_MOD_PATH=${{ github.workspace }}/out
 
       - name: Copy deb files and create archive
         run: |
-          echo "Present Working Directory"
-          cd /6tops/gitlab/edgeble/core/kernel-6.1
-          mkdir linux-6.1 && mkdir -p dtb/rockchip && mkdir -p modules-6.1
-          cp -fv arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtb dtb/rockchip
-          cp -fv arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtbo dtb/rockchip
-          cp -fv arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dtb dtb/rockchip
-          cp -fv .config linux-6.1
-          cp -frv arch/arm64/boot/Image dtb linux-6.1
-          tar -Jcf linux-6.1.tar.xz linux-6.1
-          cp -frv /6tops/out/lib/modules/* modules-6.1
-          tar -Jcf modules-6.1.tar.xz modules-6.1
+          echo "Copy DTB:"
+          cp -fv ${{ github.workspace }}/kernel-6.1/arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtb ${{ github.workspace }}/out/dtb/rockchip
+          cp -fv ${{ github.workspace }}/kernel-6.1/arch/arm64/boot/dts/rockchip/rk3588-edgeble-*.dtbo ${{ github.workspace }}/out/dtb/rockchip
+          cp -fv ${{ github.workspace }}/kernel-6.1/arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dtb ${{ github.workspace }}/out/dtb/rockchip
+
+          echo "Copy config:"
+          cp -fv ${{ github.workspace }}/kernel-6.1/.config ${{ github.workspace }}/out/linux-6.1
+
+          echo "Create linux-6.1:"
+          cp -frv ${{ github.workspace }}/kernel-6.1/arch/arm64/boot/Image ${{ github.workspace }}/out/dtb ${{ github.workspace }}/out/linux-6.1
+
+          echo "Create modules-6.1:"
+          cp -frv ${{ github.workspace }}/out/lib/modules/* ${{ github.workspace }}/out/modules-6.1
+
+          echo "Create tar.xz"
+          cd ${{ github.workspace }}/out/
+          tar -Jcf linux-6.1.tar.xz linux-6.1 && tar -Jcf modules-6.1.tar.xz modules-6.1
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.12"
+          tag_name: "v1.13"
           body: |
-            - Fix 4K Cam
+            - RTL8852BE support (backport from v6.5)
           files: |
-            /6tops/gitlab/edgeble/core/kernel-6.1/linux-6.1.tar.xz
-            /6tops/gitlab/edgeble/core/kernel-6.1/modules-6.1.tar.xz
+            ${{ github.workspace }}/out/linux-6.1.tar.xz
+            ${{ github.workspace }}/out/modules-6.1.tar.xz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
