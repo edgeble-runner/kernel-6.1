@@ -49,9 +49,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.13"
+          tag_name: "v1.14"
           body: |
-            - RTL8852BE support (backport from v6.5)
+            - Audio Fix
+            - Suspend support
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
