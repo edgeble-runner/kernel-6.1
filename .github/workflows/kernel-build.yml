@@ -49,9 +49,11 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.15"
+          tag_name: "v1.16"
           body: |
-            - RTL8852BE BT support
+            - Fix 6 Cameras
+            - Fix DP0 4k@60Hz
+            - Add DWC0 Perpheral
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
