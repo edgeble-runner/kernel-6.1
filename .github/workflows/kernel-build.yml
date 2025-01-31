@@ -49,11 +49,12 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.16"
+          tag_name: "v1.17"
           body: |
             - Fix 6 Cameras
             - Fix DP0 4k@60Hz
             - Add DWC0 Perpheral
+            - Add GNSS peripheral at UART7  
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
