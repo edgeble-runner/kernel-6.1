@@ -37,7 +37,7 @@ jobs:
 
       - name: Clone and Compile
         run: |
-          git clone --branch linux-6.1-stan-rkr4.1 git@gitlab.com:edgeble/core/kernel-6.1.git && cd kernel-6.1
+          git clone --branch linux-6.1-stan-rkr1 git@gitlab.com:edgeble/core/kernel-6.1.git && cd kernel-6.1
           export CROSS_COMPILE=aarch64-linux-gnu-
           ARCH=arm64 make rockchip_linux_defconfig edgeble-6tops.config
           mkdir -p ${{ github.workspace }}/out
@@ -69,10 +69,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.17-rk4.1"
+          tag_name: "v1.18"
           body: |
-            - Add rk4.1 kernel
-            - Add edgeble DT, DTBO
+            - Add 1080p@90fps
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
