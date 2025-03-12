@@ -37,7 +37,7 @@ jobs:
 
       - name: Clone and Compile
         run: |
-          git clone linux-6.1-stan-rkr1 git@gitlab.com:edgeble/core/kernel-6.1.git && cd kernel-6.1
+          git clone git@gitlab.com:edgeble/core/kernel-6.1.git && cd kernel-6.1
           export CROSS_COMPILE=aarch64-linux-gnu-
           ARCH=arm64 make rockchip_linux_defconfig edgeble-6tops.config
           mkdir -p ${{ github.workspace }}/out
