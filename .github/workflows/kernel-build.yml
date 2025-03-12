@@ -37,7 +37,7 @@ jobs:
 
       - name: Clone and Compile
         run: |
-          git clone git@gitlab.com:edgeble/core/kernel-6.1.git && cd kernel-6.1
+          git clone git@gitlab.com:maheshkarre1/kernel-6.1.git && cd kernel-6.1
           export CROSS_COMPILE=aarch64-linux-gnu-
           ARCH=arm64 make rockchip_linux_defconfig edgeble-6tops.config
           mkdir -p ${{ github.workspace }}/out
@@ -69,9 +69,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.19"
+          tag_name: "v1.20"
           body: |
-            - Add 1080p@90fps
+            - Add 1080p@30fps
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
