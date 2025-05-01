@@ -2,8 +2,8 @@ name: Build and Release Edgeble Kernel-6.1
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v*' # Trigger only on version tags
 
 jobs:
   build:
@@ -37,6 +37,13 @@ jobs:
 
       - name: Clone Kernel
         run: git clone git@gitlab.com:edgeble/core/kernel-6.1.git
+
+      - name: Update LOCALVERSION dynamically
+        run: |
+          VERSION_TAG=${{ github.ref_name }}
+          echo "Updating LOCALVERSION to -${VERSION_TAG}"
+          sed -i "s/^CONFIG_LOCALVERSION=.*/CONFIG_LOCALVERSION=\"-${VERSION_TAG}\"/" .github/workflows/runner.config
+          cat .github/workflows/runner.config
 
       - name: Copy runner.config
         run: cp .github/workflows/runner.config kernel-6.1/arch/arm64/configs/runner.config
@@ -72,12 +79,24 @@ jobs:
           cd ${{ github.workspace }}/out/
           tar -Jcf linux-6.1.tar.xz linux-6.1 && tar -Jcf modules-6.1.tar.xz modules-6.1
 
+      - name: Get commit body for release notes
+        id: get_commit_message
+        run: |
+          TAG_SHA=$(git rev-list -n 1 ${{ github.ref_name }})
+          echo "Commit SHA: $TAG_SHA"
+          BODY=$(git log --format=%B -n 1 $TAG_SHA | tail -n +2)
+          CLEAN_BODY=$(echo "$BODY" | grep -vE '^(Signed-off-by|Acked-by|Tested-by|Reviewed-by|Co-authored-by):')
+          echo "Cleaned body:"
+          echo "$CLEAN_BODY"
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$CLEAN_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v1.24"
-          body: |
-            - Enable 1080@60fps
+          tag_name: ${{ github.ref_name }}
+          body: ${{ steps.get_commit_message.outputs.body }}
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
