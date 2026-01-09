@@ -76,10 +76,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v2.02"
+          tag_name: "v2.03"
           body: |
-            - Add firefly ITX-3588
-            - Fix Display GDM
+            - Add tower-light
+            - Add IMX415 RPi Wave
           files: |
             ${{ github.workspace }}/out/linux-6.1.tar.xz
             ${{ github.workspace }}/out/modules-6.1.tar.xz
